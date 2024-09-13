@@ -3,7 +3,6 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"time"
 )
 
 var (
@@ -24,7 +23,7 @@ func Parse[T jwt.Claims](tokenString string, claims T) (T, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte(signingKey), nil
-		}, jwt.WithLeeway(1*time.Second),
+		},
 	)
 	if err != nil {
 		fmt.Println(err)
