@@ -20,8 +20,6 @@ type UploadFile struct {
 	Filepath string
 }
 
-// 请求客户端
-var httpClient = &http.Client{}
 
 func HttpGet(reqUrl string, reqParams map[string]string, headers map[string]string) ([]byte, error) {
 	urlParams := url.Values{}
