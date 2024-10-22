@@ -5,26 +5,31 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 )
 
 const (
-	// 生成激活码的所有字符
+	// ActivateCodeBase 生成激活码的所有字符
 	ActivateCodeBase = "hve8s2dzx9c7p5ik3mjufr4wy1tn6bgq"
-	// 激活码第二位：分隔用字符
+	// ActivateCodeSuffixChar 激活码第二位：分隔用字符
 	ActivateCodeSuffixChar = "a"
-	// 生成邀请码的所有字符
+	// InviteCodeBase 生成邀请码的所有字符
 	InviteCodeBase = "HVE8S2DZX9C7P5IK3MJUFR4WY1TN6BGQ"
-	// 邀请码第二位：分隔用字符
+	// InviteCodeSuffixChar 邀请码第二位：分隔用字符
 	InviteCodeSuffixChar = "A"
-	// 生成优惠吗的所有字符
+	// PromoCodeBase 生成优惠吗的所有字符
 	PromoCodeBase = "HVE8S2DZX9C7P5IK3MJUFR4WY1TN6BGQ"
-	// 优惠码第二位：分隔用字符
+	// PromoCodeSuffixChar 优惠码第二位：分隔用字符
 	PromoCodeSuffixChar = "A"
-	// 进制
+	// BinLen 进制
 	BinLen = 32
 )
 
-// 生成一定长度的激活码
+var baseStr string = "NPRSF5G6QW1C2D3E4H7J8K9AZBLMTUVXY0"
+var base []byte = []byte(baseStr)
+var baseMap map[byte]int
+
+// IdToActivateCode 生成一定长度的激活码
 func IdToActivateCode(id int, size int) string {
 	var activateCode string
 	for id > 0 {
@@ -50,7 +55,7 @@ func IdToActivateCode(id int, size int) string {
 	return activateCode
 }
 
-// 生成一定长度的优惠吗
+// IdToPromoCode 生成一定长度的优惠吗
 func IdToPromoCode(id int, size int) string {
 	var promoCode string
 	for id > 0 {
@@ -76,7 +81,42 @@ func IdToPromoCode(id int, size int) string {
 	return promoCode
 }
 
-// 根据 userId 得到用户的邀请码
+// InviteCodeToUserId 邀请码转化为用户id
+func InviteCodeToUserId(code string) int64 {
+	res := int64(0)
+	lenCode := len(code)
+	baseArr := []byte(InviteCodeBase) // 字符串进制转换为byte数组
+	baseRev := make(map[byte]int)     // 进制数据键值转换为map
+	for k, v := range baseArr {
+		baseRev[v] = k
+	}
+
+	// 查找补位字符的位置
+	isPad := strings.Index(code, InviteCodeSuffixChar)
+	if isPad != -1 {
+		lenCode = isPad
+	}
+
+	r := 0
+	for i := 0; i < lenCode; i++ {
+		// 补充字符直接跳过
+		if string(code[i]) == InviteCodeSuffixChar {
+			continue
+		}
+		index := baseRev[code[i]]
+		b := int64(1)
+		for j := 0; j < r; j++ {
+			b *= BinLen
+		}
+		// pow 类型为 float64 , 类型转换太麻烦, 所以自己循环实现pow的功能
+		//res += float64(index) * math.Pow(float64(32), float64(2))
+		res += int64(index) * b
+		r++
+	}
+	return res
+}
+
+// UserIdToInviteCode 根据 userId 得到用户的邀请码
 func UserIdToInviteCode(userId int, size int) string {
 	var inviteCode string
 	for userId > 0 {
@@ -102,10 +142,6 @@ func UserIdToInviteCode(userId int, size int) string {
 	return inviteCode
 }
 
-var baseStr string = "NPRSF5G6QW1C2D3E4H7J8K9AZBLMTUVXY0"
-var base []byte = []byte(baseStr)
-var baseMap map[byte]int
-
 func InitBaseMap() {
 	baseMap = make(map[byte]int)
 	for i, v := range base {
@@ -113,9 +149,9 @@ func InitBaseMap() {
 	}
 }
 
-// 将用户id转化为6位固定邀请码
-func EncodeInviteCode(n uint64) []byte {
-	quotient := n
+// EncodeInviteCode 将用户id转化为6位固定邀请码
+func EncodeInviteCode(n int64) []byte {
+	quotient := uint64(n)
 	mod := uint64(0)
 	l := list.New()
 	for quotient != 0 {
@@ -151,7 +187,7 @@ func EncodeInviteCode(n uint64) []byte {
 
 }
 
-// 邀请码转化为用户id
+// DecodeInviteCode 邀请码转化为用户id
 func DecodeInviteCode(str []byte) (uint64, error) {
 	InitBaseMap()
 	if baseMap == nil {

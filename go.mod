@@ -3,6 +3,7 @@ module github.com/firma/framework-common
 go 1.23.0
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/fogleman/gg v1.3.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-kratos/kratos/v2 v2.8.0
