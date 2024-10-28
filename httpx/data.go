@@ -33,7 +33,9 @@ func EncoderResponse() http.EncodeResponseFunc {
 			Message: "",
 			Data:    i,
 		}
-		codec := encoding.GetCodec("json")
+		//codec := encoding.GetCodec("json")
+		codec := encoding.GetCodec("name")
+		
 		data, err := codec.Marshal(resp)
 		if err != nil {
 			return err
