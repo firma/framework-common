@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"math/rand"
@@ -76,4 +77,24 @@ func GenerateLoginToken(id int64) (token string) {
 	token = hex.EncodeToString(m.Sum(nil))
 
 	return
+}
+
+func CheckHMACSHA512(digest, secret, signature string) bool {
+	secretKey := []byte(secret)
+	data := []byte(digest)
+
+	mac := hmac.New(sha512.New, secretKey)
+	mac.Write(data)
+	expectedMAC := mac.Sum(nil)
+	//expHex := hex.EncodeToString(expectedMAC)
+	//if expHex == signature {
+	//	return true
+	//} else {
+	//	return false
+	//}
+	if sign, err := hex.DecodeString(signature); err != nil {
+		return false
+	} else {
+		return hmac.Equal(expectedMAC, sign)
+	}
 }
