@@ -2,13 +2,14 @@ package queue
 
 import (
 	"context"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/go-kratos/kratos/v2/log"
+
 	"time"
 )
 
 type (
 	Logger interface {
-		logx.Logger
+		log.Logger
 	}
 	Serialize interface {
 		Marshal() ([]byte, error)

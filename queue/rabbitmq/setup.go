@@ -3,9 +3,10 @@ package rabbitmq
 import (
 	"context"
 	"github.com/firma/framework-common/queue"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/rabbitmq/amqp091-go"
 	"github.com/streadway/amqp"
 	"github.com/zeromicro/go-queue/rabbitmq"
-	"github.com/zeromicro/go-zero/core/logx"
 	mq "github.com/zeromicro/go-zero/core/queue"
 	"github.com/zeromicro/go-zero/core/threading"
 )
@@ -45,7 +46,7 @@ func (q *hub) RegisterSubscribe(subscribe queue.ISubscribe) {
 func (q *hub) Start() error {
 	q.admin = rabbitmq.MustNewAdmin(q.cfg)
 
-	logx.Infow("开启队列")
+	log.Infow("开启队列")
 
 	for _, v := range q.subscribers {
 
@@ -101,7 +102,7 @@ func (q *hub) Start() error {
 			},
 		)
 
-		logx.Infow("注册队列", logx.Field("name", v.TopicName()))
+		log.Infow("注册队列", "name", v.TopicName())
 
 		q.consumers[v.TopicName()+":"+v.Channel()] = s
 
@@ -116,7 +117,7 @@ func (q *hub) Stop() error {
 		v.Stop()
 	}
 
-	logx.Infow("结束队列")
+	log.Infow("结束队列")
 
 	return nil
 }

@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/firma/framework-common/queue"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/nsqio/go-nsq"
 	"time"
 )
 
@@ -34,8 +35,8 @@ func (p *nsqProducer) Publish(ctx context.Context, topic string, intf interface{
 		return err
 	}
 	if err := p.producer.Publish(topic, data); err != nil {
-		logx.WithContext(ctx).Errorw(
-			"NsqPublish", logx.Field("err", err), logx.Field("topic", topic), logx.Field("topic", string(data)),
+		log.Errorw(
+			"NsqPublish", "err", err, "topic", topic, "topic", string(data),
 		)
 		return err
 	} else {
@@ -50,8 +51,8 @@ func (p *nsqProducer) DeferredPublish(ctx context.Context, topic string, intf in
 		return err
 	}
 	if err := p.producer.DeferredPublish(topic, delay, data); err != nil {
-		logx.WithContext(ctx).Errorw(
-			"NsqDeferredPub", logx.Field("err", err), logx.Field("topic", topic), logx.Field("topic", string(data)),
+		log.Errorw(
+			"NsqDeferredPub", "err", err, "topic", topic, "topic", string(data),
 		)
 		return err
 	} else {

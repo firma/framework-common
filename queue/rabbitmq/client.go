@@ -6,7 +6,6 @@ import (
 	"github.com/firma/framework-common/stores/gormx"
 	"github.com/firma/framework-common/stores/redisx"
 	"github.com/zeromicro/go-queue/rabbitmq"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -15,8 +14,8 @@ var Producer queue.IProducer
 
 type Config struct {
 	rest.RestConf
-	WsPort     int
-	LogConf    logx.LogConf
+	WsPort int
+	//LogConf    logx.LogConf
 	NsqConfig  nsq.NsqConfig
 	Rabbitmq   rabbitmq.RabbitConf
 	DB         gormx.Config
@@ -26,7 +25,7 @@ type Config struct {
 }
 
 func (conf *Config) InitConfig() {
-	logx.MustSetup(conf.LogConf)
+	//logx.MustSetup(conf.LogConf)
 }
 
 func MustSetup(config Config) {

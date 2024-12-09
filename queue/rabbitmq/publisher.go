@@ -4,10 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/firma/framework-common/queue"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/streadway/amqp"
 	"github.com/zeromicro/go-queue/rabbitmq"
-	"github.com/zeromicro/go-zero/core/logx"
-	"log"
 	"time"
 )
 
@@ -40,7 +39,7 @@ func (q *publisher) Publish(ctx context.Context, topic string, data any) error {
 		return err
 	}
 
-	logx.WithContext(ctx).Debugw("发布消息", logx.Field("topic", topic), logx.Field("data", data))
+	log.Debugw("发布消息", "topic", topic, "data", data)
 
 	return q.sender.Send(topic, "", res)
 }
@@ -51,7 +50,7 @@ func (q *publisher) DeferredPublish(ctx context.Context, topic string, data any,
 		return err
 	}
 
-	logx.WithContext(ctx).Debugw("发布延迟消息", logx.Field("topic", topic), logx.Field("data", data))
+	log.Debugw("发布延迟消息", "topic", topic, "data", data)
 	return q.sender.SendDelay(topic, "", res, delay)
 }
 

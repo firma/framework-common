@@ -3,8 +3,8 @@ package nsq
 import (
 	"context"
 	"github.com/firma/framework-common/queue"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nsqio/go-nsq"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 // 1.defaultHandler 是一个消费者类型
@@ -61,7 +61,7 @@ func (n NSQQueue) Start() error {
 		if err != nil {
 			return err
 		}
-		logx.Infow("注册消费队列", logx.Field("topic", v.TopicName()), logx.Field("channel", v.Channel()))
+		log.Infow("注册消费队列", "topic", v.TopicName(), "channel", v.Channel())
 
 		consumer.AddHandler(
 			newDefaultHandler(v.Handler()),

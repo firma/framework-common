@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/firma/framework-common/httpx"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/olahol/melody"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type (
@@ -102,7 +102,7 @@ func (r *WebsocketUnaryRouter) ConnectHandler(session *melody.Session) {
 		isNext := fn(ctx)
 		if !isNext {
 			if err := session.Close(); err != nil {
-				logx.WithContext(ctx).Error(err)
+				log.Error(err)
 			}
 		}
 	}
@@ -121,7 +121,7 @@ func (r *WebsocketUnaryRouter) MessageHandler(session *melody.Session, msg []byt
 	var data MetaData
 	if err := json.Unmarshal(msg, &data); err != nil {
 		if ce := session.Write([]byte("unexpected input")); ce != nil {
-			logx.WithContext(ctx).Error(ce)
+			log.Error(ce)
 		}
 
 		return
@@ -130,7 +130,7 @@ func (r *WebsocketUnaryRouter) MessageHandler(session *melody.Session, msg []byt
 	rn, err := r.Match(data.Code)
 	if err != nil {
 		if ce := session.Write([]byte(err.Error())); ce != nil {
-			logx.WithContext(ctx).Error(ce)
+			log.Error(ce)
 		}
 
 		return
@@ -141,14 +141,14 @@ func (r *WebsocketUnaryRouter) MessageHandler(session *melody.Session, msg []byt
 	res, err := json.Marshal(resp)
 	if err != nil {
 		if ce := session.Write([]byte(err.Error())); ce != nil {
-			logx.WithContext(ctx).Error(ce)
+			log.Error(ce)
 		}
 
 		return
 	}
 
 	if ce := session.Write(res); ce != nil {
-		logx.WithContext(ctx).Error(ce)
+		log.Error(ce)
 	}
 }
 
@@ -159,7 +159,7 @@ func (r *WebsocketUnaryRouter) DisconnectHandler(session *melody.Session) {
 		isNext := fn(ctx)
 		if !isNext {
 			if err := session.Close(); err != nil {
-				logx.WithContext(ctx).Error(err)
+				log.Error(err)
 			}
 		}
 	}
@@ -170,13 +170,13 @@ func (cm *ConnectionManager) Run() {
 		select {
 		case v := <-cm.Register:
 			cm.connections[v.UserID] = v.Session
-			logx.Debugw("维系的用户连接", logx.Field("connections", cm.connections))
+			log.Debugf("维系的用户连接 connections %v", cm.connections)
 
 		case s := <-cm.Unregister:
 			if _, has := cm.connections[s.UserID]; has {
 				delete(cm.connections, s.UserID)
 			}
-			logx.Debugw("维系的用户连接", logx.Field("connections", cm.connections))
+			log.Debugw("维系的用户连接connections %v", cm.connections)
 		}
 	}
 }
