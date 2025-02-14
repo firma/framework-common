@@ -5,13 +5,10 @@ import (
 	"github.com/firma/framework-common/stores/redisx"
 	"github.com/go-kratos/kratos/v2/log"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/zeromicro/go-zero/core/logx"
-
-	//"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
+	//"time"
 )
 
 type (
@@ -19,7 +16,7 @@ type (
 		DSN        string
 		LogLevel   logger.LogLevel
 		RedisCache *redisx.Config
-		Logger     *log.Helper
+		Logger     log.Logger
 	}
 
 	DBManager struct {
@@ -34,7 +31,6 @@ func (m DBManager) GetDB(ctx context.Context) (*gorm.DB, error) {
 func MustBuildGormDB(conf Config) *DBManager {
 	m, err := BuildDBManager(conf)
 	if err != nil {
-		logx.ErrorStack(err)
 		panic(err)
 	}
 
@@ -53,9 +49,9 @@ func BuildDBManager(conf Config) (*DBManager, error) { //, logger logger.Interfa
 	}
 
 	gormLogger := NewGormLogger(conf.Logger)
-	gormLogger.LogMode(conf.LogLevel)                      //// 日志级别
-	gormLogger.conf.SlowThreshold = 300 * time.Millisecond //// 慢 SQL 阈值
-	gormLogger.conf.Colorful = true                        // 禁用彩色打印
+	gormLogger.LogMode(conf.LogLevel) //// 日志级别
+	//gormLogger.conf.SlowThreshold = 300 * time.Millisecond //// 慢 SQL 阈值
+	//gormLogger.conf.Colorful = true                        // 禁用彩色打印
 
 	client, err := gorm.Open(
 		mysql.New(mysqlConfig), &gorm.Config{
