@@ -2,6 +2,7 @@ package utils
 
 import (
 	crand "crypto/rand"
+
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -17,7 +18,18 @@ const letters = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const letters2 = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/=_-"
 const numbers = "1234567890"
 
-var src = rand.NewSource(time.Now().UnixNano())
+var (
+	src = rand.NewSource(time.Now().UnixNano())
+)
+
+// GenerateAbsoluteUniqueOrderNumber 生成绝对唯一的订单号
+func GenerateAbsoluteUniqueOrderNumber(prefix string, refId int64) string {
+	rand.Seed(time.Now().UnixNano())
+
+	ref := UserIdToInviteCode(int(refId), 8)
+	orderNumber := strings.ToUpper(fmt.Sprintf("%s%s%010d", ref, prefix, rand.Intn(9999999999)))
+	return orderNumber
+}
 
 const (
 	// 6 bits to represent a letter index
