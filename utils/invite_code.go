@@ -82,9 +82,14 @@ func IdToPromoCode(id int, size int) string {
 }
 
 // InviteCodeToUserId 邀请码转化为用户id
+// 将邀请码转换为用户ID，采用32进制转换算法
+// 参数:
+//   - code: 待转换的邀请码字符串
+//
+// 返回:
+//   - int64: 转换后的用户ID
 func InviteCodeToUserId(code string) int64 {
 	res := int64(0)
-	lenCode := len(code)
 	baseArr := []byte(InviteCodeBase) // 字符串进制转换为byte数组
 	baseRev := make(map[byte]int)     // 进制数据键值转换为map
 	for k, v := range baseArr {
@@ -93,49 +98,77 @@ func InviteCodeToUserId(code string) int64 {
 
 	// 查找补位字符的位置
 	isPad := strings.Index(code, InviteCodeSuffixChar)
+	effectiveLength := len(code)
 	if isPad != -1 {
-		lenCode = isPad
+		effectiveLength = isPad
 	}
 
-	r := 0
-	for i := 0; i < lenCode; i++ {
-		// 补充字符直接跳过
+	// 处理每个字符（跳过分隔符）
+	for i := 0; i < effectiveLength; i++ {
 		if string(code[i]) == InviteCodeSuffixChar {
 			continue
 		}
-		index := baseRev[code[i]]
+
+		index, exists := baseRev[code[i]]
+		if !exists {
+			// 无效字符
+			return -1
+		}
+
+		// 计算位置值（从左到右读取）
+		power := effectiveLength - i - 1
+		if i >= isPad && isPad != -1 {
+			power--
+		}
+
 		b := int64(1)
-		for j := 0; j < r; j++ {
+		for j := 0; j < power; j++ {
 			b *= BinLen
 		}
-		// pow 类型为 float64 , 类型转换太麻烦, 所以自己循环实现pow的功能
-		//res += float64(index) * math.Pow(float64(32), float64(2))
+
 		res += int64(index) * b
-		r++
 	}
+
 	return res
 }
 
 // UserIdToInviteCode 根据 userId 得到用户的邀请码
+// 将用户ID转换为特定长度的邀请码
+// 参数:
+//   - userId: 用户ID（整数）
+//   - size: 生成的邀请码期望长度
+//
+// 返回:
+//   - string: 生成的邀请码
 func UserIdToInviteCode(userId int, size int) string {
-	var inviteCode string
-	for userId > 0 {
-		index := userId % BinLen
-		inviteCode = string(InviteCodeBase[index]) + inviteCode
-		userId = userId / BinLen
+	if userId <= 0 {
+		// 处理边界情况
+		code := string(InviteCodeBase[0]) + InviteCodeSuffixChar
+		for len(code) < size {
+			code += string(InviteCodeBase[rand.Intn(len(InviteCodeBase))])
+		}
+		return code
 	}
 
-	length := len(inviteCode)
-	if length < size-1 {
+	var inviteCode string
+	temp := userId
+
+	// 将用户ID转换为32进制字符串
+	for temp > 0 {
+		index := temp % BinLen
+		inviteCode = string(InviteCodeBase[index]) + inviteCode
+		temp = temp / BinLen
+	}
+
+	// 处理补位：添加分隔符和随机字符（如需要）
+	if len(inviteCode) < size-1 {
 		inviteCode += InviteCodeSuffixChar
-		length++
-		for length < size {
+		for len(inviteCode) < size {
 			inviteCode += string(InviteCodeBase[rand.Intn(len(InviteCodeBase))])
-			length++
 		}
-	} else if length < size {
+	} else if len(inviteCode) < size {
 		inviteCode += InviteCodeSuffixChar
-	} else {
+	} else if len(inviteCode) > size {
 		inviteCode = Substring(inviteCode, 0, size)
 	}
 

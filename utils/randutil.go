@@ -23,11 +23,11 @@ var (
 )
 
 // GenerateAbsoluteUniqueOrderNumber 生成绝对唯一的订单号
-func GenerateAbsoluteUniqueOrderNumber(prefix string, refId int64) string {
+func GenerateAbsoluteUniqueOrderNumber(prefix string) string {
 	rand.Seed(time.Now().UnixNano())
-
-	ref := UserIdToInviteCode(int(refId), 8)
-	orderNumber := strings.ToUpper(fmt.Sprintf("%s%s%010d", ref, prefix, rand.Intn(9999999999)))
+	number := int(time.Now().UnixMicro())
+	inviteCode := UserIdToInviteCode(number, 11)
+	orderNumber := strings.ToUpper(fmt.Sprintf("%s%s%07d", prefix, inviteCode, rand.Intn(9999999)))
 	return orderNumber
 }
 

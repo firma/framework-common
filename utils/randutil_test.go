@@ -32,7 +32,7 @@ func TestGenerateOrderNumberConcurrency(t *testing.T) {
 
 			// 生成订单号
 			//orderNum := GenerateShortIdWithPrefix("T")
-			orderNum := GenerateAbsoluteUniqueOrderNumber(int64(i))
+			orderNum := GenerateAbsoluteUniqueOrderNumber("R")
 			if numGoroutines == 20000 {
 				fmt.Println(orderNum, len(orderNum))
 			}
