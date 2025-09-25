@@ -45,3 +45,4 @@ source_binary
 *.swp
 *.iml
 *.idl
+.claude
